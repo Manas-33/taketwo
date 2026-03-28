@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+google-genai
+PyPDF2
+ffmpeg-python
+python-dotenv
+pydantic
+aiofiles
+httpx
+Pillow

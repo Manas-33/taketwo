@@ -1,0 +1,160 @@
+"use client";
+
+import { useRef, useState, useCallback } from "react";
+import { Upload, Loader2, ImagePlus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import type { Prop } from "@/types";
+
+interface PropCardProps {
+  prop: Prop;
+  onUpload?: (assetId: string, file: File) => Promise<void>;
+  onRemove?: (assetId: string) => Promise<void>;
+  onDelete?: (assetId: string) => Promise<void>;
+  generating?: boolean;
+}
+
+export default function PropCard({ prop, onUpload, onRemove, onDelete, generating }: PropCardProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  const processFile = useCallback(async (file: File) => {
+    if (!onUpload || !file.type.startsWith("image/")) return;
+    setUploading(true);
+    try {
+      await onUpload(prop.id, file);
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }, [onUpload, prop.id]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  }, [processFile]);
+
+  const hasImage = !!prop.imageUrl;
+
+  return (
+    <div className="group flex flex-col">
+      <div
+        className={`relative aspect-square w-full overflow-hidden rounded-xl transition-all ${
+          dragOver
+            ? "ring-2 ring-orange-400 ring-offset-2 bg-orange-50"
+            : hasImage ? "bg-stone-200" : "bg-stone-100"
+        }`}
+        onDragOver={(e) => { e.preventDefault(); if (onUpload) setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+      >
+        {hasImage ? (
+          <>
+            <img
+              src={prop.imageUrl!}
+              alt={prop.name}
+              className="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-105"
+            />
+            {!uploading && !removing && (
+              <div className="absolute bottom-2 right-2 flex gap-1.5 opacity-0 transition-all group-hover:opacity-100">
+                {onUpload && (
+                  <button
+                    onClick={() => inputRef.current?.click()}
+                    className="flex items-center gap-1.5 rounded-lg bg-white/90 px-2.5 py-1.5 text-[11px] font-medium text-stone-700 shadow-sm backdrop-blur-sm transition-all hover:bg-white"
+                  >
+                    <RefreshCw size={12} />
+                    Replace
+                  </button>
+                )}
+                {onRemove && (
+                  <button
+                    onClick={async () => { setRemoving(true); try { await onRemove(prop.id); } finally { setRemoving(false); } }}
+                    className="flex items-center gap-1.5 rounded-lg bg-white/90 px-2.5 py-1.5 text-[11px] font-medium text-red-600 shadow-sm backdrop-blur-sm transition-all hover:bg-red-50"
+                  >
+                    <Trash2 size={12} />
+                    Remove
+                  </button>
+                )}
+              </div>
+            )}
+            {removing && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm">
+                <Loader2 size={24} className="animate-spin text-red-500" />
+              </div>
+            )}
+          </>
+        ) : generating ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3 bg-linear-to-br from-orange-50 to-stone-100">
+            <div className="relative flex h-12 w-12 items-center justify-center">
+              <div className="absolute inset-0 animate-ping rounded-full bg-orange-200/40" />
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                <Sparkles size={18} className="animate-pulse text-orange-600" />
+              </div>
+            </div>
+            <span className="text-xs font-medium text-orange-600">Generating...</span>
+          </div>
+        ) : onUpload ? (
+          <button
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-stone-300 transition-colors hover:border-orange-400 hover:bg-orange-50/50"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-200 transition-colors group-hover:bg-orange-100">
+              <ImagePlus size={18} className="text-stone-400 transition-colors group-hover:text-orange-600" />
+            </div>
+            <span className="text-xs font-medium text-stone-400 transition-colors group-hover:text-stone-600">Upload Image</span>
+          </button>
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <div className="h-10 w-10 animate-pulse rounded-full bg-stone-300" />
+          </div>
+        )}
+
+        {uploading && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 size={24} className="animate-spin text-orange-600" />
+              <span className="text-xs font-medium text-stone-600">Uploading...</span>
+            </div>
+          </div>
+        )}
+
+        {dragOver && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-orange-50/90 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-2">
+              <Upload size={24} className="text-orange-600" />
+              <span className="text-xs font-semibold text-orange-600">Drop image here</span>
+            </div>
+          </div>
+        )}
+
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f); }}
+          className="hidden"
+        />
+      </div>
+      <div className="mt-2 flex items-start justify-between">
+        <div className="min-w-0">
+          <h3 className="text-sm font-bold text-stone-900">{prop.name}</h3>
+          <p className="text-xs uppercase text-stone-400">{prop.category}</p>
+        </div>
+        {onDelete && (
+          <button
+            onClick={async () => { setDeleting(true); try { await onDelete(prop.id); } catch { setDeleting(false); } }}
+            disabled={deleting}
+            className="mt-0.5 flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-medium text-stone-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+            title="Remove asset"
+          >
+            {deleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
