@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const activeIndex = NAV_ITEMS.findIndex(
     (item) =>
-      effectivePath === item.href || effectivePath.startsWith(item.href + "/")
+      effectivePath === item.href || effectivePath.startsWith(item.href + "/"),
   );
 
   return (

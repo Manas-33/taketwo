@@ -47,6 +47,8 @@ Return a JSON object with exactly this structure:
       "actions": "Detailed description of what happens visually in the scene, including camera movements and blocking",
       "dialogue": ["KEY_LINE: Brief key dialogue lines"],
       "cameraNote": "WIDE ANGLE | CLOSE UP | MACRO SHOT | TRACKING SHOT | AERIAL DRONE | STATIC INTERIOR | DOLLY | HANDHELD",
+      "lightingStyle": "Concrete lighting description for AI video generation (e.g., 'warm golden hour sidelight with long shadows on dusty ground', 'harsh overhead fluorescents with green cast on pale skin', 'soft diffused overcast daylight filtering through curtains'). Must describe direction, quality, color temperature, and how light interacts with the environment.",
+      "visualStyle": "Cinematic visual style and color palette (e.g., 'gritty desaturated tones with teal shadows and crushed blacks', 'vibrant saturated warmth with subtle lens flare', 'high contrast noir with deep blacks and sharp highlights'). Should complement the scene's mood and genre.",
       "estimatedDuration": 15
     }
   ]
@@ -63,7 +65,9 @@ Rules:
 8. Extract ALL characters, even minor ones, with importance noted in the role field
 9. If the script doesn't explicitly state appearance details, infer reasonable defaults from context
 10. Camera notes should suggest the most cinematically appropriate shot type for each scene
-11. estimatedDuration is the estimated video length in seconds (integer, min 8, max 148). Estimate based on:
+11. lightingStyle must be a concrete, visual description — avoid abstract words like "moody" or "dramatic". Describe what the light actually looks like: direction, color, intensity, shadows, reflections
+12. visualStyle must describe the color palette, contrast, and film stock look — avoid vague terms. Be specific about colors and tonal qualities
+13. estimatedDuration is the estimated video length in seconds (integer, min 8, max 148). Estimate based on:
     - Dialogue length: ~2 seconds per short line, ~4 seconds per long line, plus pauses
     - Action complexity: simple actions 8-15s, moderate 15-30s, complex sequences 30-60s+
     - Establishing/atmosphere shots: 8-15s

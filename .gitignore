@@ -1,188 +1,68 @@
-assets/1- landing page.png
-assets/2- Asset Library.png
-assets/3. Scene Gallery.png
-assets/4. Unified Scene & Background Editor.png
-assets/5. Final Assembly (Grid).png
-backend/app/routers/__pycache__/__init__.cpython-312.pyc
-backend/app/routers/__pycache__/assets.cpython-312.pyc
-backend/app/routers/__pycache__/continuity.cpython-312.pyc
-backend/app/routers/__pycache__/export.cpython-312.pyc
-backend/app/routers/__pycache__/scenes.cpython-312.pyc
-backend/app/routers/__pycache__/script.cpython-312.pyc
-backend/app/routers/__pycache__/test.cpython-312.pyc
-backend/app/__pycache__/__init__.cpython-312.pyc
-backend/app/__pycache__/config.cpython-312.pyc
-backend/app/__pycache__/main.cpython-312.pyc
-backend/app/models/__pycache__/__init__.cpython-312.pyc
-backend/app/models/__pycache__/schemas.cpython-312.pyc
-backend/data/.DS_Store
-backend/data/projects/.DS_Store
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/project.json
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/characters/char_01.jpeg
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/characters/char_02.png
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/characters/char_03.jpeg
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/costumes/costume_01.png
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/costumes/costume_02.png
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/props/prop_01.png
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/props/prop_02.png
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/props/prop_03.png
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/props/prop_04.png
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/assets/props/prop_05.png
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/scenes/scene_01.mp4
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/scenes/scene_02.mp4
-backend/data/projects/05c8505c-1547-4027-bd39-0aba3d09eafd/script/Script Reduction Two Scenes.pdf
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/project.json
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/assets/characters/char_01.jpeg
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/assets/characters/char_02.png
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/assets/characters/char_03.jpeg
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/assets/costumes/costume_01.png
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/assets/costumes/costume_02.png
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/export/final.mp4
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/scenes/scene_01.mp4
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/scenes/scene_02.mp4
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/scenes/scene_01/footage.mp4
-backend/data/projects/0cefc0b3-9309-4cc4-82b6-0e4bbf498643/script/Script Reduction Two Scenes.pdf
-backend/data/projects/1a40600a-80a5-4413-9a9c-65cf5791a26c/project.json
-backend/data/projects/1a40600a-80a5-4413-9a9c-65cf5791a26c/script/Script Reduction Two Scenes.pdf
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/project.json
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/assets/characters/char_01.jpeg
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/assets/characters/char_02.png
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/assets/characters/char_03.jpeg
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/assets/costumes/costume_01.png
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/assets/costumes/costume_02.png
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/assets/costumes/costume_03.png
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/export/final.mp4
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/scenes/scene_01.mp4
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/scenes/scene_02.mp4
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/scenes/scene_01/footage.mp4
-backend/data/projects/22b34f25-6bc5-4028-ac95-08d0a0a36553/script/Script Reduction Two Scenes.pdf
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/project.json
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/characters/char_01.jpeg
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/characters/char_02.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/characters/char_03.jpeg
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/costumes/costume_01.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/costumes/costume_02.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/costumes/costume_03.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/props/prop_01.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/props/prop_02.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/props/prop_03.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/props/prop_04.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/assets/props/prop_05.png
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/scenes/scene_01.mp4
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/scenes/scene_02.mp4
-backend/data/projects/2379c7d5-454e-4e33-94d3-09f180496c02/script/Script Reduction Two Scenes.pdf
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/project.json
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/characters/char_01.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/characters/char_02.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/characters/char_03.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/costumes/costume_01.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/costumes/costume_02.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/props/prop_01.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/props/prop_02.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/props/prop_03.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/props/prop_04.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/assets/props/prop_05.png
-backend/data/projects/2dc4c182-0782-4105-98da-513ed211e590/script/Script Reduction Two Scenes.pdf
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/project.json
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/characters/char_01.jpeg
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/characters/char_02.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/characters/char_03.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/costumes/costume_01.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/costumes/costume_02.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/props/prop_01.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/props/prop_02.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/props/prop_03.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/props/prop_04.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/assets/props/prop_05.png
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/scenes/scene_01.mp4
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/scenes/scene_02.mp4
-backend/data/projects/34bf6364-dbd1-4982-9ec1-f30e55ac50f2/script/Script Reduction Two Scenes.pdf
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/project.json
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/characters/char_01.jpeg
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/characters/char_02.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/characters/char_03.jpeg
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/costumes/costume_01.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/costumes/costume_02.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/costumes/costume_03.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/props/prop_01.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/props/prop_02.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/props/prop_03.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/props/prop_04.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/props/prop_05.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/assets/props/prop_06.png
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/scenes/scene_01.mp4
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/scenes/scene_02.mp4
-backend/data/projects/90dc7adc-beb9-4b29-ba43-dcc040ba7731/script/Script Reduction Two Scenes.pdf
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/project.json
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/characters/char_01.jpeg
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/characters/char_02.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/characters/char_03.jpeg
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/costumes/costume_01.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/costumes/costume_02.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/costumes/costume_03.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/props/prop_01.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/props/prop_02.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/props/prop_03.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/props/prop_04.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/props/prop_05.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/assets/props/prop_06.png
-backend/data/projects/97055704-9fc1-4a88-a4ea-ddde2eecf325/script/Script Reduction Two Scenes.pdf
-backend/data/projects/9b360b94-17ff-4e01-ad9d-dae7c32afffa/project.json
-backend/data/projects/9b360b94-17ff-4e01-ad9d-dae7c32afffa/script/Script Reduction Two Scenes.pdf
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/project.json
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/characters/char_01.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/characters/char_02.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/characters/char_03.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/costumes/costume_01.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/costumes/costume_02.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/costumes/costume_03.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/props/prop_01.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/props/prop_02.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/props/prop_03.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/props/prop_04.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/assets/props/prop_05.png
-backend/data/projects/9c453516-94d1-4109-bec4-d8e9914bcd5a/script/Script Reduction Two Scenes.pdf
-backend/data/projects/b30ef5c7-d036-47b7-ad08-9967fc986367/project.json
-backend/data/projects/b30ef5c7-d036-47b7-ad08-9967fc986367/script/Script Reduction Two Scenes.pdf
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/project.json
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/characters/char_01.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/characters/char_02.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/characters/char_03.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/costumes/costume_01.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/costumes/costume_02.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/props/prop_01.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/props/prop_02.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/props/prop_03.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/props/prop_04.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/assets/props/prop_05.png
-backend/data/projects/c4652393-53a6-4ffc-9ba9-1239d5d3a36c/script/Script Reduction Two Scenes.pdf
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/project.json
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/characters/char_01.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/characters/char_02.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/characters/char_03.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/costumes/costume_01.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/costumes/costume_02.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/props/prop_01.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/props/prop_02.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/props/prop_03.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/props/prop_04.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/assets/props/prop_05.png
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/export/final.mp4
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/scenes/scene_01.mp4
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/scenes/scene_02.mp4
-backend/data/projects/cf5f517a-0052-4083-9a4c-8831ae937c50/script/Script Reduction Two Scenes.pdf
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/project.json
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/characters/char_01.jpeg
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/characters/char_02.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/characters/char_03.jpeg
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/costumes/costume_01.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/costumes/costume_02.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/costumes/costume_03.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/props/prop_01.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/props/prop_02.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/props/prop_03.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/props/prop_04.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/assets/props/prop_05.png
-backend/data/projects/d67a7935-51d4-456c-a92b-b07a2afcf93c/script/Script Reduction Two Scenes.pdf
-backend/data/test/veo_test.mp4
-backend/.env
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+venv/
+.venv/
+env/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vercel
+
+# Build
+*.pem
+
+# Data / uploads
+backend/data/
+
+# Assets (if generated/large)
+assets/

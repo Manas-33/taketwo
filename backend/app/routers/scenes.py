@@ -45,6 +45,7 @@ async def _generate_single_scene(
         scene["videoUrl"] = result["videoUrl"]
         scene["thumbnailUrl"] = result.get("thumbnailUrl")
         scene["duration"] = result.get("duration")
+        scene["veoVideoUri"] = result.get("veoVideoUri")
         scene["status"] = "generated"
         _invalidate_export(project_id)
         storage_service.update_project(project_id, {"scriptData.scenes": scenes})
@@ -133,6 +134,7 @@ async def regenerate_scene(scene_id: str, project_id: str, background_tasks: Bac
         scene["videoUrl"] = result["videoUrl"]
         scene["thumbnailUrl"] = result.get("thumbnailUrl")
         scene["duration"] = result.get("duration")
+        scene["veoVideoUri"] = result.get("veoVideoUri")
         scene["status"] = "generated"
         _invalidate_export(project_id)
         storage_service.update_project(project_id, {"scriptData.scenes": scenes})
@@ -184,6 +186,7 @@ async def edit_scene(scene_id: str, project_id: str, body: EditRequest, backgrou
             )
             scene["videoUrl"] = result["videoUrl"]
             scene["duration"] = result.get("duration")
+            scene["veoVideoUri"] = result.get("veoVideoUri")
             scene["status"] = "generated"
             _invalidate_export(project_id)
             logger.info("[%s] Scene %s regenerated from edit", project_id[:8], scene_id)
@@ -248,6 +251,7 @@ async def upload_scene_footage(
     url = storage_service.upload_file(file_bytes, dest, content_type)
 
     scene["videoUrl"] = f"{url}?t={int(time.time())}"
+    scene["veoVideoUri"] = None
     scene["status"] = "generated"
     _invalidate_export(project_id)
     storage_service.update_project(project_id, {"scriptData.scenes": scenes})
@@ -270,6 +274,7 @@ async def remove_scene_footage(scene_id: str, project_id: str):
 
     scene["videoUrl"] = None
     scene["thumbnailUrl"] = None
+    scene["veoVideoUri"] = None
     scene["duration"] = None
     scene["status"] = "pending"
     _invalidate_export(project_id)

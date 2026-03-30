@@ -3,7 +3,8 @@ import os
 import uuid
 import logging
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from app.services import storage_service, gemini_service
+from app.models.schemas import ContinuityCorrectRequest
+from app.services import storage_service, gemini_service, veo_service
 
 logger = logging.getLogger("filmai.continuity")
 router = APIRouter()
@@ -168,4 +169,77 @@ async def get_continuity(project_id: str):
     return {
         "status": project.get("continuityStatus", "idle"),
         "data": project.get("continuityData", []),
+    }
+
+
+@router.post("/{project_id}/correct/{scene_id}")
+async def correct_scene(
+    project_id: str,
+    scene_id: str,
+    body: ContinuityCorrectRequest,
+    background_tasks: BackgroundTasks,
+):
+    project = storage_service.get_project(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    script_data = project.get("scriptData", {})
+    scenes = script_data.get("scenes", [])
+    scene = next((s for s in scenes if s["id"] == scene_id), None)
+    if not scene:
+        raise HTTPException(status_code=404, detail="Scene not found")
+
+    continuity_data = project.get("continuityData", [])
+    scene_cont = next((c for c in continuity_data if c["sceneId"] == scene_id), None)
+    if not scene_cont or not scene_cont.get("issues"):
+        raise HTTPException(status_code=400, detail="No continuity issues found for this scene")
+
+    if body.issue_ids:
+        issues_to_fix = [i for i in scene_cont["issues"] if i["id"] in body.issue_ids]
+        if not issues_to_fix:
+            raise HTTPException(status_code=400, detail="None of the specified issue IDs were found")
+    else:
+        issues_to_fix = scene_cont["issues"]
+
+    logger.info(
+        "[%s] Queuing continuity correction for scene %s (%d issues)",
+        project_id[:8], scene_id, len(issues_to_fix),
+    )
+
+    async def _apply_correction():
+        try:
+            scene["status"] = "generating"
+            storage_service.update_project(project_id, {"scriptData.scenes": scenes})
+
+            result = await veo_service.correct_scene_video(
+                scene=scene,
+                characters=script_data.get("characters", []),
+                props=script_data.get("props", []),
+                costumes=script_data.get("costumes", []),
+                project_id=project_id,
+                issues=issues_to_fix,
+            )
+
+            scene["videoUrl"] = result["videoUrl"]
+            scene["duration"] = result.get("duration")
+            scene["veoVideoUri"] = result.get("veoVideoUri")
+            scene["status"] = "generated"
+            storage_service.update_project(project_id, {"scriptData.scenes": scenes})
+
+            for issue in scene_cont["issues"]:
+                if not body.issue_ids or issue["id"] in body.issue_ids:
+                    issue["status"] = "corrected"
+
+            storage_service.update_project(project_id, {"continuityData": continuity_data})
+            logger.info("[%s] Continuity correction complete for scene %s", project_id[:8], scene_id)
+        except Exception as e:
+            logger.error("[%s] Continuity correction FAILED for scene %s: %s", project_id[:8], scene_id, e, exc_info=True)
+            scene["status"] = "generated"
+            storage_service.update_project(project_id, {"scriptData.scenes": scenes})
+
+    background_tasks.add_task(_apply_correction)
+    return {
+        "status": "correcting",
+        "message": f"Applying {len(issues_to_fix)} continuity correction(s) for scene",
+        "issueCount": len(issues_to_fix),
     }

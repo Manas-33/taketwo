@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "FilmAI - AI Film Production Pipeline",
-  description: "Transform screenplays into cinematic video with AI-powered production tools",
+  description:
+    "Transform screenplays into cinematic video with AI-powered production tools",
 };
 
 export default function RootLayout({

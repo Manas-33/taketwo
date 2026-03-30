@@ -155,6 +155,10 @@ Carefully inspect the footage for these categories of continuity issues:
 
 Be thorough but realistic. Only report genuine issues you can see in the video.
 
+For each issue, provide a bounding box indicating WHERE in the frame the issue is visible at the given timestamp.
+Use normalized coordinates from 0.0 to 1.0 relative to the video frame dimensions (0,0 is top-left, 1,1 is bottom-right).
+If the issue is scene-wide (e.g. overall lighting change) and cannot be localized, set boundingBox to null.
+
 Return a JSON object:
 {{
   "issues": [
@@ -164,7 +168,8 @@ Return a JSON object:
       "title": "Short descriptive title (e.g. 'Prop mismatch: Cup moved')",
       "description": "Detailed description of the issue",
       "timestamp": "MM:SS approximate timestamp in the current scene video",
-      "autoFixAvailable": false
+      "autoFixAvailable": false,
+      "boundingBox": {{ "x": 0.0-1.0, "y": 0.0-1.0, "width": 0.0-1.0, "height": 0.0-1.0 }} or null
     }}
   ],
   "score": 0-100,
@@ -175,7 +180,7 @@ If no issues are found, return an empty issues array and score of 100."""
 
     logger.info("Sending continuity analysis request for scene %s (with_prev=%s)", scene.get("id"), has_prev)
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-flash-latest",
         contents=[*video_parts, prompt],
         config=genai.types.GenerateContentConfig(
             temperature=0.2,

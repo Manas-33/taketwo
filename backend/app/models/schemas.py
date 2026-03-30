@@ -67,10 +67,13 @@ class Scene(BaseModel):
     actions: str
     dialogue: list[str] = []
     cameraNote: str = ""
+    lightingStyle: str = ""
+    visualStyle: str = ""
     previousSceneContext: Optional[str] = None
     nextSceneContext: Optional[str] = None
     videoUrl: Optional[str] = None
     thumbnailUrl: Optional[str] = None
+    veoVideoUri: Optional[str] = None
     estimatedDuration: Optional[float] = None
     duration: Optional[float] = None
     status: str = "pending"
@@ -106,6 +109,17 @@ class TransformRequest(BaseModel):
     backgroundShift: Optional[str] = None
 
 
+class ContinuityCorrectRequest(BaseModel):
+    issue_ids: Optional[list[str]] = None
+
+
+class BoundingBox(BaseModel):
+    x: float
+    y: float
+    width: float
+    height: float
+
+
 class ContinuityIssue(BaseModel):
     id: str = ""
     type: str
@@ -114,6 +128,7 @@ class ContinuityIssue(BaseModel):
     description: str
     timestamp: str
     autoFixAvailable: bool = False
+    boundingBox: Optional[BoundingBox] = None
 
 
 class SceneContinuity(BaseModel):

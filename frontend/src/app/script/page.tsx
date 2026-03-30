@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ScriptUploader from "@/components/script/ScriptUploader";
-import { Loader2, Sparkles, CheckCircle2 } from "lucide-react";
+import { Loader2, Sparkles, CheckCircle2, Film } from "lucide-react";
+
+const DEMO_PROJECT_ID = "f74c661b-f35f-447c-b5bf-9a3e32e70174";
 
 export default function ScriptPage() {
   const router = useRouter();
@@ -50,8 +52,31 @@ export default function ScriptPage() {
     }
   };
 
+  const handleLoadDemo = () => {
+    localStorage.setItem("filmai_project_id", DEMO_PROJECT_ID);
+    router.push("/scenes");
+  };
+
   if (!projectId) {
-    return <ScriptUploader onUploadComplete={handleUploadComplete} />;
+    return (
+      <>
+        <ScriptUploader onUploadComplete={handleUploadComplete} />
+        <div className="fixed bottom-6 left-6">
+          <button
+            onClick={handleLoadDemo}
+            className="flex items-center gap-2.5 rounded-xl bg-white px-5 py-3.5 shadow-lg border border-stone-200 transition-all hover:border-orange-300 hover:shadow-xl"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100">
+              <Film size={16} className="text-orange-600" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-stone-800">The Launch and the Legacy</p>
+              <p className="text-xs text-stone-400">Resume demo project</p>
+            </div>
+          </button>
+        </div>
+      </>
+    );
   }
 
   return (

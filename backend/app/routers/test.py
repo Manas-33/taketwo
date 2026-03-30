@@ -16,7 +16,7 @@ async def test_veo():
 
     operation = await asyncio.to_thread(
         client.models.generate_videos,
-        model="veo-3.1-fast-generate-preview",
+        model="veo-3.1-generate-preview",
         prompt="A gentle ocean wave rolling onto a sandy beach at golden hour. Cinematic, slow motion.",
         config=genai.types.GenerateVideosConfig(
             aspect_ratio="16:9",

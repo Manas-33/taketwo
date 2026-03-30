@@ -155,6 +155,17 @@ export async function getContinuity(projectId: string): Promise<{
   return res.data;
 }
 
+export async function correctContinuityIssues(
+  projectId: string,
+  sceneId: string,
+  issueIds?: string[],
+): Promise<{ status: string; message: string; issueCount: number }> {
+  const res = await api.post(`/api/continuity/${projectId}/correct/${sceneId}`, {
+    issue_ids: issueIds ?? null,
+  });
+  return res.data;
+}
+
 export async function testVeo(): Promise<{ status: string; videoUrl?: string; message?: string }> {
   const res = await api.post("/api/test/veo");
   return res.data;

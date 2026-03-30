@@ -87,11 +87,12 @@ def resolve_image_path(image_url: str | None) -> str | None:
     """Convert a storage URL back to a local file path, or None if not found."""
     if not image_url:
         return None
+    url_clean = image_url.split("?")[0]
     prefix = "/files/"
-    idx = image_url.find(prefix)
+    idx = url_clean.find(prefix)
     if idx == -1:
         return None
-    relative = image_url[idx + len(prefix):]
+    relative = url_clean[idx + len(prefix):]
     full_path = os.path.join(DATA_DIR, relative)
     return full_path if os.path.exists(full_path) else None
 

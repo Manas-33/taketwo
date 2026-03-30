@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { getContinuity } from "@/lib/api";
+import { getContinuity, correctContinuityIssues } from "@/lib/api";
 import {
   ArrowLeft,
   AlertTriangle,
@@ -12,8 +12,9 @@ import {
   Shirt,
   Trees,
   Wand2,
-  ChevronRight,
   Loader2,
+  CheckCircle2,
+  Crosshair,
 } from "lucide-react";
 import type { Project, Scene, SceneContinuity, ContinuityIssue } from "@/types";
 
@@ -53,6 +54,8 @@ export default function ContinuityDetailPage() {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [correcting, setCorrecting] = useState(false);
+  const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!projectId) return;
@@ -68,8 +71,8 @@ export default function ContinuityDetailPage() {
         if (projRes) setProject(projRes);
         if (contRes?.data) {
           const match = contRes.data.find(
-            (c: SceneContinuity) => c.sceneId === sceneId,
-          );
+            (c) => c.sceneId === sceneId,
+          ) as SceneContinuity | undefined;
           if (match) setContinuity(match);
         }
       } catch {
@@ -102,11 +105,30 @@ export default function ContinuityDetailPage() {
     };
   }, [scene?.videoUrl]);
 
+  const parseTimestamp = (ts: string): number => {
+    const parts = ts.split(":").map(Number);
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return 0;
+  };
+
   const togglePlay = () => {
     if (!videoRef.current) return;
-    if (playing) videoRef.current.pause();
-    else videoRef.current.play();
+    if (playing) {
+      videoRef.current.pause();
+    } else {
+      setSelectedIssueId(null);
+      videoRef.current.play();
+    }
     setPlaying(!playing);
+  };
+
+  const handleIssueClick = (issue: ContinuityIssue) => {
+    if (!videoRef.current) return;
+    videoRef.current.pause();
+    videoRef.current.currentTime = parseTimestamp(issue.timestamp);
+    setPlaying(false);
+    setSelectedIssueId(issue.id === selectedIssueId ? null : issue.id);
   };
 
   const formatTime = (t: number) => {
@@ -123,6 +145,24 @@ export default function ContinuityDetailPage() {
     const ratio = (e.clientX - rect.left) / rect.width;
     videoRef.current.currentTime = ratio * duration;
   };
+
+  const handleCorrectAll = useCallback(async () => {
+    if (!projectId || correcting) return;
+    setCorrecting(true);
+    try {
+      await correctContinuityIssues(projectId, sceneId);
+    } catch {
+      setCorrecting(false);
+    }
+  }, [projectId, sceneId, correcting]);
+
+  const isSceneRegenerating = scene?.status === "generating";
+
+  useEffect(() => {
+    if (scene && scene.status !== "generating") {
+      setCorrecting(false);
+    }
+  }, [scene?.status]);
 
   if (!projectId || !scene) {
     return (
@@ -219,8 +259,40 @@ export default function ContinuityDetailPage() {
             </div>
           </div>
 
+          {/* Bounding box overlay */}
+          {selectedIssueId && (() => {
+            const issue = continuity?.issues.find((i) => i.id === selectedIssueId);
+            if (!issue?.boundingBox) return null;
+            const { x, y, width, height } = issue.boundingBox;
+            const borderColor = issue.severity === "critical" ? "rgba(239,68,68,0.9)" : "rgba(245,158,11,0.9)";
+            const bgColor = issue.severity === "critical" ? "rgba(239,68,68,0.12)" : "rgba(245,158,11,0.12)";
+            return (
+              <div
+                className="pointer-events-none absolute"
+                style={{
+                  left: `${x * 100}%`,
+                  top: `${y * 100}%`,
+                  width: `${width * 100}%`,
+                  height: `${height * 100}%`,
+                  border: `2px solid ${borderColor}`,
+                  backgroundColor: bgColor,
+                  borderRadius: "4px",
+                  boxShadow: `0 0 0 1px rgba(0,0,0,0.3), 0 0 12px ${borderColor}`,
+                  transition: "all 0.2s ease-out",
+                }}
+              >
+                <span
+                  className="absolute -top-6 left-0 max-w-[200px] truncate rounded px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                  style={{ backgroundColor: borderColor }}
+                >
+                  {issue.title}
+                </span>
+              </div>
+            );
+          })()}
+
           {/* Play button */}
-          {!playing && scene.videoUrl && (
+          {!playing && scene.videoUrl && !selectedIssueId && (
             <button
               onClick={togglePlay}
               className="absolute inset-0 flex items-center justify-center"
@@ -293,11 +365,17 @@ export default function ContinuityDetailPage() {
                   ISSUE_COLOR[
                     issue.severity as ContinuityIssue["severity"]
                   ] ?? ISSUE_COLOR.warning;
+                const isSelected = selectedIssueId === issue.id;
 
                 return (
                   <div
                     key={issue.id}
-                    className={`rounded-xl border ${color.bg} bg-white p-4`}
+                    onClick={() => handleIssueClick(issue)}
+                    className={`cursor-pointer rounded-xl border transition-all ${
+                      isSelected
+                        ? "border-orange-400 bg-orange-50 ring-2 ring-orange-200"
+                        : `${color.bg} bg-white hover:bg-stone-50`
+                    } p-4`}
                   >
                     <div className="flex items-start gap-3">
                       <div
@@ -321,21 +399,23 @@ export default function ContinuityDetailPage() {
                           <h4 className="text-sm font-semibold text-stone-900">
                             {issue.title}
                           </h4>
-                          <span className="text-xs text-stone-400">
-                            {issue.timestamp}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            {issue.boundingBox && (
+                              <Crosshair size={12} className="text-orange-500" />
+                            )}
+                            <span className="text-xs text-stone-400">
+                              {issue.timestamp}
+                            </span>
+                          </div>
                         </div>
                         <p className="mt-1 text-xs text-stone-500">
                           {issue.description}
                         </p>
-                        {issue.autoFixAvailable && (
-                          <p className="mt-2 text-[11px] text-stone-400">
-                            Auto-fix available via AI
+                        {(issue as unknown as { status?: string }).status === "corrected" && (
+                          <p className="mt-2 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+                            <CheckCircle2 size={12} /> Correction applied
                           </p>
                         )}
-                        <button className="mt-2 flex items-center gap-1 text-xs font-semibold text-orange-600 hover:text-orange-700">
-                          Review <ChevronRight size={12} />
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -372,10 +452,32 @@ export default function ContinuityDetailPage() {
           </div>
         )}
 
-        {/* Apply Auto-Corrections */}
-        {continuity?.issues.some((i) => i.autoFixAvailable) && (
-          <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-800">
-            <Wand2 size={16} /> Apply Auto-Corrections
+        {/* Correcting Banner */}
+        {(correcting || isSceneRegenerating) && (
+          <div className="mt-4 flex items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 p-3">
+            <Loader2 size={16} className="animate-spin text-orange-600" />
+            <p className="text-xs font-medium text-orange-800">
+              Regenerating scene with corrections...
+            </p>
+          </div>
+        )}
+
+        {/* Apply All Corrections */}
+        {continuity && continuity.issues.length > 0 && (
+          <button
+            onClick={handleCorrectAll}
+            disabled={correcting || isSceneRegenerating}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {correcting || isSceneRegenerating ? (
+              <>
+                <Loader2 size={16} className="animate-spin" /> Correcting...
+              </>
+            ) : (
+              <>
+                <Wand2 size={16} /> Fix All Issues ({continuity.issues.length})
+              </>
+            )}
           </button>
         )}
       </aside>

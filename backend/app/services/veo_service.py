@@ -1,5 +1,6 @@
 import asyncio
 import os
+import time
 import logging
 from math import ceil
 from google import genai
@@ -11,7 +12,7 @@ logger = logging.getLogger("filmai.veo")
 MAX_REFERENCE_IMAGES = 3
 INITIAL_CLIP_SECONDS = 8
 EXTENSION_SECONDS = 7
-MAX_EXTENSIONS = 1
+MAX_EXTENSIONS = 0
 EXTENSION_PROCESSING_DELAY = 15
 EXTENSION_RETRY_ATTEMPTS = 4
 EXTENSION_RETRY_BACKOFF = 15
@@ -77,22 +78,38 @@ def _load_reference_images(
     return ref_images
 
 
+LIGHTING_FALLBACK = {
+    "Morning": "soft warm golden morning light with gentle shadows",
+    "Afternoon": "bright natural overhead sunlight with well-defined shadows",
+    "Evening": "warm amber golden hour lighting with long dramatic shadows",
+    "Night": "cool blue moonlight with deep shadows and practical light sources",
+    "Dawn": "pale pink and blue pre-dawn light, soft and diffused",
+    "Dusk": "rich orange and purple twilight, silhouettes against glowing sky",
+}
+
+DEFAULT_VISUAL_STYLE = "cinematic color grading, photorealistic, high production value"
+
+
 def _build_scene_prompt(scene: dict, characters: list, props: list, costumes: list,
                          prev_context: str | None, next_context: str | None) -> str:
+    prompt_parts = []
+
+    camera = scene.get("cameraNote", "").strip()
+    if camera:
+        prompt_parts.append(f"{camera}.")
+
+    prompt_parts.append(f"{scene['actions']}.")
+
+    prompt_parts.append(f"Location: {scene['location']}. Time of day: {scene['timeOfDay']}.")
+
     char_descriptions = []
     for cid in scene.get("characters", []):
         char = next((c for c in characters if c["id"] == cid), None)
         if char:
+            desc = f"{char['name']}: {char['appearance']}"
             if char.get("imageDescription") == "User uploaded" and char.get("imageUrl"):
-                char_descriptions.append(f"{char['name']} (see reference image)")
-            else:
-                char_descriptions.append(f"{char['name']}: {char['appearance']}")
-
-    prop_descriptions = []
-    for pid in scene.get("props", []):
-        prop = next((p for p in props if p["id"] == pid), None)
-        if prop:
-            prop_descriptions.append(f"{prop['name']}: {prop['description']}")
+                desc += " (see reference image)"
+            char_descriptions.append(desc)
 
     costume_descriptions = []
     for costid in scene.get("costumes", []):
@@ -100,13 +117,11 @@ def _build_scene_prompt(scene: dict, characters: list, props: list, costumes: li
         if cost:
             costume_descriptions.append(f"{cost['name']}: {cost['description']}")
 
-    prompt_parts = [
-        f"Cinematic film scene: {scene['title']}.",
-        f"Location: {scene['location']}.",
-        f"Time of day: {scene['timeOfDay']}.",
-        f"Mood and atmosphere: {scene['mood']}.",
-        f"Action: {scene['actions']}.",
-    ]
+    prop_descriptions = []
+    for pid in scene.get("props", []):
+        prop = next((p for p in props if p["id"] == pid), None)
+        if prop:
+            prop_descriptions.append(f"{prop['name']}: {prop['description']}")
 
     if char_descriptions:
         prompt_parts.append(f"Characters present: {'; '.join(char_descriptions)}.")
@@ -114,17 +129,22 @@ def _build_scene_prompt(scene: dict, characters: list, props: list, costumes: li
         prompt_parts.append(f"Costumes: {'; '.join(costume_descriptions)}.")
     if prop_descriptions:
         prompt_parts.append(f"Props visible: {'; '.join(prop_descriptions)}.")
-    if scene.get("cameraNote"):
-        prompt_parts.append(f"Camera style: {scene['cameraNote']}.")
+
+    lighting = scene.get("lightingStyle", "").strip()
+    if not lighting:
+        lighting = LIGHTING_FALLBACK.get(scene.get("timeOfDay", ""), "natural ambient lighting")
+    style = scene.get("visualStyle", "").strip() or DEFAULT_VISUAL_STYLE
+    prompt_parts.append(f"Lighting: {lighting}. Visual style: {style}.")
+
+    dialogue = scene.get("dialogue", [])
+    if dialogue:
+        dialogue_cues = "; ".join(dialogue)
+        prompt_parts.append(f"Dialogue: {dialogue_cues}.")
+
     if prev_context:
         prompt_parts.append(f"Previous scene context for continuity: {prev_context}")
     if next_context:
         prompt_parts.append(f"Following scene context: {next_context}")
-
-    prompt_parts.append(
-        "Professional cinematography, film grain, cinematic color grading, "
-        "high production value, photorealistic."
-    )
 
     return " ".join(prompt_parts)
 
@@ -161,7 +181,7 @@ async def _request_extension_with_retry(client, video, prompt, config, ext_label
         try:
             return await asyncio.to_thread(
                 client.models.generate_videos,
-                model="veo-3.1-fast-generate-preview",
+                model="veo-3.1-generate-preview",
                 video=video,
                 prompt=prompt,
                 config=config,
@@ -225,12 +245,14 @@ async def _poll_operation(client, operation, label: str):
     return operation, poll_count
 
 
-async def _download_and_save(client, video, project_id: str, scene_id: str) -> tuple[str, int]:
+async def _download_and_save(client, video, project_id: str, scene_id: str) -> tuple[str, int, str | None]:
+    veo_uri = getattr(video.video, "uri", None)
     video_data = await asyncio.to_thread(client.files.download, file=video.video)
     video_bytes = video_data if isinstance(video_data, bytes) else b"".join(video_data)
     dest = f"projects/{project_id}/scenes/{scene_id}.mp4"
     url = upload_file(video_bytes, dest, "video/mp4")
-    return url, len(video_bytes)
+    url = f"{url}?t={int(time.time())}"
+    return url, len(video_bytes), veo_uri
 
 
 async def generate_scene_video(
@@ -260,7 +282,7 @@ async def generate_scene_video(
     try:
         operation = await asyncio.to_thread(
             client.models.generate_videos,
-            model="veo-3.1-fast-generate-preview",
+            model="veo-3.1-generate-preview",
             prompt=prompt,
             config=config,
         )
@@ -272,7 +294,7 @@ async def generate_scene_video(
     label = f"Scene '{scene.get('title')}'"
     operation, poll_count = await _poll_operation(client, operation, label)
 
-    result = {"videoUrl": None, "thumbnailUrl": None, "duration": None}
+    result = {"videoUrl": None, "thumbnailUrl": None, "duration": None, "veoVideoUri": None}
 
     if operation.response and operation.response.generated_videos:
         video = operation.response.generated_videos[0]
@@ -285,21 +307,128 @@ async def generate_scene_video(
             poll_count += ext_polls
             final_duration = INITIAL_CLIP_SECONDS + extensions * EXTENSION_SECONDS
 
+            result["veoVideoUri"] = getattr(final_video, "uri", None)
             video_data = await asyncio.to_thread(client.files.download, file=final_video)
             video_bytes = video_data if isinstance(video_data, bytes) else b"".join(video_data)
             dest = f"projects/{project_id}/scenes/{scene['id']}.mp4"
-            url = upload_file(video_bytes, dest, "video/mp4")
+            url = f"{upload_file(video_bytes, dest, 'video/mp4')}?t={int(time.time())}"
             result["videoUrl"] = url
             result["duration"] = float(final_duration)
             logger.info("%s - extended video saved (%d bytes, %.0fs, %d polls)", label, len(video_bytes), final_duration, poll_count)
         else:
             logger.info("%s - downloading generated video (no extensions needed)", label)
-            url, nbytes = await _download_and_save(client, video, project_id, scene["id"])
+            url, nbytes, veo_uri = await _download_and_save(client, video, project_id, scene["id"])
             result["videoUrl"] = url
             result["duration"] = float(INITIAL_CLIP_SECONDS)
+            result["veoVideoUri"] = veo_uri
             logger.info("%s - video saved (%d bytes, %d polls)", label, nbytes, poll_count)
     else:
         logger.error("%s - Veo returned no video! Operation response: %s", label, operation.response)
+
+    return result
+
+
+def _build_correction_prompt(
+    scene: dict,
+    characters: list,
+    props: list,
+    costumes: list,
+    issues: list,
+) -> str:
+    """Build a Veo editing prompt to fix specific continuity issues in an existing video."""
+
+    correction_lines = []
+    for issue in issues:
+        title = issue.get("title", "")
+        desc = issue.get("description", "")
+        correction_lines.append(f"{title}: {desc}" if desc else title)
+
+    parts = [
+        f"Edit this video to fix the following continuity issues: "
+        f"{'; '.join(correction_lines)}.",
+    ]
+
+    char_descriptions = []
+    for cid in scene.get("characters", []):
+        char = next((c for c in characters if c["id"] == cid), None)
+        if char:
+            char_descriptions.append(f"{char['name']}: {char['appearance']}")
+
+    costume_descriptions = []
+    for costid in scene.get("costumes", []):
+        cost = next((c for c in costumes if c["id"] == costid), None)
+        if cost:
+            costume_descriptions.append(f"{cost['name']}: {cost['description']}")
+
+    prop_descriptions = []
+    for pid in scene.get("props", []):
+        prop = next((p for p in props if p["id"] == pid), None)
+        if prop:
+            prop_descriptions.append(f"{prop['name']}: {prop['description']}")
+
+    if char_descriptions:
+        parts.append(f"Character reference: {'; '.join(char_descriptions)}.")
+    if costume_descriptions:
+        parts.append(f"Costume reference: {'; '.join(costume_descriptions)}.")
+    if prop_descriptions:
+        parts.append(f"Prop reference: {'; '.join(prop_descriptions)}.")
+
+    parts.append(
+        "Preserve the scene's composition, lighting, camera angles, and pacing. "
+        "Only modify what is necessary to fix the listed issues."
+    )
+
+    return " ".join(parts)
+
+
+async def correct_scene_video(
+    scene: dict,
+    characters: list,
+    props: list,
+    costumes: list,
+    project_id: str,
+    issues: list,
+) -> dict:
+    """Regenerate a scene video with a correction-focused prompt and reference images."""
+    client = get_client()
+    ref_images = _load_reference_images(scene, characters, props, costumes)
+    prompt = _build_correction_prompt(scene, characters, props, costumes, issues)
+    label = f"Scene '{scene.get('title')}' correction"
+
+    logger.info(
+        "%s - regenerating to fix %d continuity issues (prompt: %d chars, %d refs)",
+        label, len(issues), len(prompt), len(ref_images),
+    )
+    logger.debug("Correction prompt: %s", prompt[:600])
+
+    config = _build_video_config(ref_images or None)
+
+    try:
+        operation = await asyncio.to_thread(
+            client.models.generate_videos,
+            model="veo-3.1-generate-preview",
+            prompt=prompt,
+            config=config,
+        )
+    except Exception as e:
+        logger.error("Veo correction request failed for scene '%s': %s", scene.get("title"), e)
+        _log_api_error_details(e)
+        raise
+
+    operation, poll_count = await _poll_operation(client, operation, label)
+
+    result = {"videoUrl": None, "thumbnailUrl": None, "duration": None, "veoVideoUri": None}
+
+    if operation.response and operation.response.generated_videos:
+        video = operation.response.generated_videos[0]
+        logger.info("%s - downloading corrected video", label)
+        url, nbytes, veo_uri = await _download_and_save(client, video, project_id, scene["id"])
+        result["videoUrl"] = url
+        result["duration"] = float(INITIAL_CLIP_SECONDS)
+        result["veoVideoUri"] = veo_uri
+        logger.info("%s - corrected video saved (%d bytes, %d polls)", label, nbytes, poll_count)
+    else:
+        logger.error("%s - Veo returned no video!", label)
 
     return result
 
@@ -330,7 +459,7 @@ async def regenerate_scene_video(
     try:
         operation = await asyncio.to_thread(
             client.models.generate_videos,
-            model="veo-3.1-fast-generate-preview",
+            model="veo-3.1-generate-preview",
             prompt=prompt,
             config=config,
         )
@@ -342,7 +471,7 @@ async def regenerate_scene_video(
     label = f"Scene '{scene.get('title')}' regen"
     operation, poll_count = await _poll_operation(client, operation, label)
 
-    result = {"videoUrl": None, "thumbnailUrl": None, "duration": None}
+    result = {"videoUrl": None, "thumbnailUrl": None, "duration": None, "veoVideoUri": None}
 
     if operation.response and operation.response.generated_videos:
         video = operation.response.generated_videos[0]
@@ -355,18 +484,20 @@ async def regenerate_scene_video(
             poll_count += ext_polls
             final_duration = INITIAL_CLIP_SECONDS + extensions * EXTENSION_SECONDS
 
+            result["veoVideoUri"] = getattr(final_video, "uri", None)
             video_data = await asyncio.to_thread(client.files.download, file=final_video)
             video_bytes = video_data if isinstance(video_data, bytes) else b"".join(video_data)
             dest = f"projects/{project_id}/scenes/{scene['id']}.mp4"
-            url = upload_file(video_bytes, dest, "video/mp4")
+            url = f"{upload_file(video_bytes, dest, 'video/mp4')}?t={int(time.time())}"
             result["videoUrl"] = url
             result["duration"] = float(final_duration)
             logger.info("%s - extended video saved (%d bytes, %.0fs, %d polls)", label, len(video_bytes), final_duration, poll_count)
         else:
             logger.info("%s - downloading video", label)
-            url, nbytes = await _download_and_save(client, video, project_id, scene["id"])
+            url, nbytes, veo_uri = await _download_and_save(client, video, project_id, scene["id"])
             result["videoUrl"] = url
             result["duration"] = float(INITIAL_CLIP_SECONDS)
+            result["veoVideoUri"] = veo_uri
             logger.info("%s - saved (%d bytes, %d polls)", label, nbytes, poll_count)
     else:
         logger.error("%s - Veo returned no video!", label)

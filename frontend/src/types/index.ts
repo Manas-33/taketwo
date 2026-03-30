@@ -50,6 +50,8 @@ export interface Scene {
   actions: string;
   dialogue: string[];
   cameraNote: string;
+  lightingStyle: string;
+  visualStyle: string;
   previousSceneContext: string | null;
   nextSceneContext: string | null;
   videoUrl: string | null;
@@ -81,6 +83,13 @@ export type ProjectStatus =
 
 export type ContinuityStatus = "no_issues" | "warning" | "critical" | "error" | "pending";
 
+export interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface ContinuityIssue {
   id: string;
   type: "prop" | "lighting" | "actor" | "costume" | "environment";
@@ -89,6 +98,7 @@ export interface ContinuityIssue {
   description: string;
   timestamp: string;
   autoFixAvailable: boolean;
+  boundingBox: BoundingBox | null;
 }
 
 export interface SceneContinuity {
